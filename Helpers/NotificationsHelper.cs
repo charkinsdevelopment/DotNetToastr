@@ -11,23 +11,18 @@ namespace Helpers
         public static string RenderNotifications()
         {
             if (HttpContext.Current.Session["Notifications"] == null) return null;
-            string jsBodyOpen = "<script>";
-            string jsBody = "";
-            string jsBodyClose = "</script>";
-
+            var jsBody = new StringBuilder();
             var notifications = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Notification>>(HttpContext.Current.Session["Notifications"].ToString());
+
+            jsBody.AppendLine("<script>");
             foreach(var note in notifications)
             {
-                if(note.NotificationType == NotificationType.Error)
-                {
-                    jsBody += $"toastr.error('{note.Message}', '{note.Title}')";
-                } else if (note.NotificationType == NotificationType.Success)
-                {
-                    jsBody += $"toastr.success('{note.Message}', '{note.Title}')";
-                }
+                jsBody.AppendLine($"toastr.{note.NotificationType.ToString().ToLower()}('{note.Message}', '{note.Title}');");
             }
+            jsBody.AppendLine("</script>");
+            
             Clear();
-            return string.Join(" ", new string[] { jsBodyOpen, jsBody, jsBodyClose});
+            return jsBody.ToString();
         }
 
         /// <summary>
@@ -61,9 +56,9 @@ namespace Helpers
     public enum NotificationType
     {
         Success,
-        Error,
+        Info,
         Warning,
-        Notice
+        Error
     }
 
     public class Notification
