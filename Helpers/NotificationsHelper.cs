@@ -56,7 +56,7 @@ namespace Helpers
     public enum NotificationType
     {
         Success,
-        Info
+        Info,
         Warning,
         Error
     }
